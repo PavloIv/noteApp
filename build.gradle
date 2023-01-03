@@ -1,0 +1,52 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'ua.ip'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	mapstructVersion = "1.4.2.Final"
+	projectLombokVersion = "1.18.24"
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6:3.1.1.RELEASE'
+	implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.1.0'
+	implementation "org.projectlombok:lombok:${projectLombokVersion}"
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'com.h2database:h2'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
+	annotationProcessor "org.projectlombok:lombok:${projectLombokVersion}"
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
