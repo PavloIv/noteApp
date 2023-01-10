@@ -15,3 +15,4 @@ public class IndexController {
         return "error/nopermission";
     }
 }
+

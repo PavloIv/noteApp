@@ -20,7 +20,7 @@
                 <label> Category: </label>
                 <select class="form-select" th:field="*{category}" id="category">
                     <option value="">select category</option>
-                    <option th:each="category : ${T(ua.goit.dev6.note.Category).values()}"
+                    <option th:each="category : ${T(ua.ip.noteApp.note.Category).values()}"
                             th:value="${category}"
                             th:text="${category.name}">
                     </option>

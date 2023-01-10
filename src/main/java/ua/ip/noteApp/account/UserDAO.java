@@ -38,13 +38,13 @@ public class UserDAO {
     private List<RoleDAO> roles = new ArrayList<>();
 
     @ManyToMany
-    @JoinTable(name = "ua/ip/noteApp/friend",
+    @JoinTable(name = "friend",
             joinColumns = @JoinColumn(name = "friend_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<UserDAO> users = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "ua/ip/noteApp/friend",
+    @JoinTable(name = "friend",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id"))
     private Set<UserDAO> friends  = new HashSet<>();
