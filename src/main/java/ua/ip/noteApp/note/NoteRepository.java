@@ -14,3 +14,4 @@ public interface NoteRepository extends JpaRepository<NoteDAO, UUID> {
     List<NoteDAO> findByUser_Id(@Param("id") UUID id);
 }
 
+

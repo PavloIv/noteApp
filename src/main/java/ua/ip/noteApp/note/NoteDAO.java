@@ -1,14 +1,17 @@
 package ua.ip.noteApp.note;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import ua.ip.noteApp.account.UserDAO;
 
+import java.util.Set;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "notes")
 public class NoteDAO {
@@ -19,9 +22,12 @@ public class NoteDAO {
 
     @Column(name = "name", nullable = false, length = 96)
     private String name;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category", nullable = false, length = 20)
+    private Category category;
     @Column(name = "content", nullable = false, length = 9600)
     private String content;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "access_type", nullable = false, length = 20)
     private AccessType accessType;
@@ -31,5 +37,10 @@ public class NoteDAO {
     @JoinColumn(name = "user_id", nullable = false)
     private UserDAO user;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "friends_notes",
+            joinColumns = @JoinColumn(name = "friend_note_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<UserDAO> users;
 
 }

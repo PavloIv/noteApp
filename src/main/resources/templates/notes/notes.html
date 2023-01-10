@@ -5,6 +5,7 @@
       lang="en">
 <head>
     <title>My Notes</title>
+    <script src="/js/filter.js"></script>
 </head>
 <body>
 <div>
@@ -12,7 +13,7 @@
         <div class="container" th:if="${#lists.isEmpty(notes)}"
              style="background:white; opacity: 0.7; overflow-y: auto">
             <h3> You didn't create any note </h3>
-            <p><a class="btn btn-secondary" href="/notes/create">Create note</a></p>
+            <p><a class="btn btn-primary" href="/notes/create">Create note</a></p>
         </div>
         <div class="container" th:if="${not #lists.isEmpty(notes)}"
              style="background:white; opacity: 0.7; overflow-y: auto">
@@ -24,31 +25,45 @@
                     Create note
                 </button>
             </form>
-            <table class="table table-striped">
+            <br>
+            <input type="text" id="filter" placeholder="filter">
+            <table id="emp-table" class="table table-striped">
                 <thead>
                 <tr>
-                    <th>Title</th>
-                    <th>Content</th>
-                    <th>Access</th>
-                    <th colspan="3" style="width:15%; max-width:200px; text-align:center">Notes managing</th>
+                    <th col-index=1>Title</th>
+                    <th col-index=2>Category
+                        <select class="table-filter" onchange="filter_rows()">
+                            <option value="all"></option>
+                        </select></th>
+                    <th col-index=3>Content</th>
+                    <th col-index=4>Access
+                        <select class="table-filter" onchange="filter_rows()">
+                            <option value="all"></option>
+                        </select></th>
+                    <th col-index=5 colspan="3" style="width:15%; max-width:200px; text-align:center">Notes managing
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="note : ${notes}">
                     <td th:text="${note.name}"></td>
+                    <td th:text="${note.category}"></td>
                     <td th:text="${note.content}"
                         style="max-width:150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis"></td>
                     <td th:text="${note.accessType}"></td>
                     <td colspan="3" style="display:flex; justify-content:space-around; max-width:200px">
-                        <button th:attr="onclick=|makeDELETErequest('/notes/${note.id}')|">
+                        <button class="btn btn-light" title="Delete"
+                                th:attr="onclick=|deleteData('/notes/${note.id}')|">
                             <img src="/icons/trash.png" alt="deleteButton"
                                  style="border:0; width:30px; height:30px"/>
                         </button>
-                        <a class="btn btn-secondary" th:href="@{/notes/{id}(id=${note.id})}">
+                        <a class="btn btn-light" title="Edit"
+                           th:href="@{/notes/{id}(id=${note.id})}">
                             <img src="/icons/edit.png"
                                  alt="editButton"
                                  style="border:0; width:30px; height:30px"/></a>
-                        <button type="submit" th:attr="onclick=|copy('/${note.id}')|">
+                        <button class="btn btn-light" title="Copy link"
+                                type="submit" th:attr="onclick=|copy('/share/${note.id}')|">
                             <img src="/icons/link-alt.png" alt="copyLinkButton"
                                  style="border:0; width:30px; height:30px"/>
                         </button>
@@ -62,25 +77,57 @@
 
 <script layout:fragment="script">
     function copy(id) {
-        // var copiedtext = document.getElementById(id);
-        // copiedtext.select();
-        // copiedtext.setSelectionRange(0, 99999); //for mobile devices
         navigator.clipboard.writeText(window.location.href + id);
         alert("You just copied " + window.location.href + id);
     }
 
-    function makeDELETErequest(urlParametr) {
-        if (confirm('Are you sure you want to delete this?')) {
-            $.ajax({
-                url: urlParametr,
-                type: 'DELETE',
-                success: function () {
-                    location.reload();
-                },
-                error: function (jqXHR, data, textStatus, errorThrown) {
-
+    function deleteData(urlParametr) {
+        if (confirm('Are you sure you want to delete this?')){
+            let url = urlParametr;
+            let urlRedirect = "/notes";
+            const response = fetch(url, {
+                method: 'DELETE',
+                mode: 'cors',
+                cache: 'no-cache',
+                credentials: 'same-origin',
+                redirect: 'manual',
+                referrerPolicy: 'strict-origin'
+            }).then((response) => {
+                if (!response.ok) {
+                    if(!alert("Wrong format! Update canceled!")){
+                        window.location.href = urlRedirect;
+                    }
+                } else {
+                    window.location.href = urlRedirect;
                 }
+            }).catch(function (err) {
+                console.info(err + " url: " + url);
             });
+        }
+
+    }
+
+    getUniqueValuesFromColumn()
+    document.getElementById('filter').addEventListener('keyup', debound(filter_table, 500))
+
+    function filter_table(e) {
+        const rows = document.querySelectorAll('tbody tr')
+        rows.forEach(row => {
+            row.style.display = (row.innerText.includes(e.target.value)) ? '' : 'none'
+        })
+    }
+
+    function debound(func, timeout) {
+        let timer
+        return (...args) => {
+            if (!timer) {
+                func.apply(this, args);
+            }
+            clearTimeout(timer)
+            timer = setTimeout(() => {
+                func.apply(this, args)
+                timer = undefined
+            }, timeout)
         }
     }
 </script>

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import ua.ip.noteApp.account.UserDTO;
 import ua.ip.noteApp.account.UserService;
+import ua.ip.noteApp.account.UserValidator;
 import ua.ip.noteApp.roles.RoleService;
 import ua.ip.noteApp.signin.SecurityService;
 

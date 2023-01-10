@@ -35,15 +35,13 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/registration", "/login").permitAll()
                         .requestMatchers("/contact","/about").permitAll()
-                        .requestMatchers("/css/*", "/js/*").permitAll()
-                        //line below add only for test purposes, after adding page with public notes this should be deleted
-                        .requestMatchers("/testaccess").hasRole("ROLE_USER")
+                        .requestMatchers("/css/*", "/js/*", "/images/*").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .permitAll()
-                        .defaultSuccessUrl("/note/list", false)
+                        .defaultSuccessUrl("/notes", true)
                 )
                 .exceptionHandling((exception) ->
                         exception.accessDeniedHandler(accessDeniedHandler())
@@ -66,11 +64,6 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AccessDeniedHandler accessDeniedHandler() {
-        return new CustomAccessDeniedHandler();
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
@@ -83,5 +76,10 @@ public class WebSecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new CustomAccessDeniedHandler();
     }
 }

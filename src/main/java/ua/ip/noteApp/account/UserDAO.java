@@ -3,6 +3,9 @@ package ua.ip.noteApp.account;
 import jakarta.persistence.*;
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import ua.ip.noteApp.note.NoteDAO;
 import ua.ip.noteApp.roles.RoleDAO;
 
@@ -14,7 +17,8 @@ import java.util.*;
 @Table(name = "users")
 public class UserDAO {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(name = "id", nullable = false)
     private UUID id;
 
@@ -33,4 +37,22 @@ public class UserDAO {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<RoleDAO> roles = new ArrayList<>();
 
+    @ManyToMany
+    @JoinTable(name = "ua/ip/noteApp/friend",
+            joinColumns = @JoinColumn(name = "friend_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<UserDAO> users = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "ua/ip/noteApp/friend",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    private Set<UserDAO> friends  = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinTable(name = "friends_notes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_note_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Set<NoteDAO> friendsNotes = new HashSet<>();
 }

@@ -1,18 +1,18 @@
-package ua.ip.noteApp.signup;
+package ua.ip.noteApp.account;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-import ua.ip.noteApp.account.UserDTO;
-import ua.ip.noteApp.account.UserService;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Component
 public class UserValidator implements Validator {
+
     private final UserService userService;
 
     private static final String EMAIL_REGEX = "^[\\w-+]+(\\.[\\w]+)*@[\\w-]+(\\.[\\w]+)*(\\.[a-z]{2,})$";
@@ -26,14 +26,28 @@ public class UserValidator implements Validator {
     public void validate(Object o, Errors errors) {
         UserDTO user = (UserDTO) o;
 
+        validateEmail(user, errors);
+        validatePassword(user, errors);
+    }
+
+    public void validateEmail(UserDTO user, Errors errors) {
+
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "email", "NotEmpty");
         if (!pattern.matcher(user.getEmail()).matches()) {
             errors.rejectValue("email", "Check.correct.email");
         }
 
-        if (!userService.findByName(user.getEmail()).isEmpty()) {
-            errors.rejectValue("email", "Duplicate.userForm.username");
+        if (!userService.findByEmail(user.getEmail()).isEmpty()) {
+            Optional<UserDTO> userFromDB = userService.findByEmail(user.getEmail());
+            if (!userFromDB.isEmpty()) {
+                if (!userFromDB.get().getId().equals(user.getId())) {
+                    errors.rejectValue("email", "Duplicate.userForm.username");
+                }
+            }
         }
+    }
+
+    public void validatePassword(UserDTO user, Errors errors) {
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "NotEmpty");
         if (user.getPassword().length() < 8 || user.getPassword().length() > 100) {
